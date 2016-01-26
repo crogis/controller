@@ -23,7 +23,8 @@ public class MainActivity extends Activity {
     private final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
     private BluetoothDevice pairedDevice;
-    // For raw binary data
+
+    // For sending raw binary data
     private OutputStream outputStream;
     // For strings - remove later
     private DataOutputStream dataOutputStream;
@@ -40,13 +41,13 @@ public class MainActivity extends Activity {
     }
 
     private void setUpControlButtons() {
-        sendStuffBtn = (Button) findViewById(R.id.sendStuff);
-        sendStuffBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                writeCommand("Hello World!");
-            }
-        });
+//        sendStuffBtn = (Button) findViewById(R.id.sendStuff);
+//        sendStuffBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                writeCommand("Hello World!");
+//            }
+//        });
 //        sendStuffBtn.setEnabled(false);
 
     }
@@ -63,7 +64,7 @@ public class MainActivity extends Activity {
     }
 
     private void setUpPairDeviceButton() {
-        Button pairDeviceBtn = (Button) findViewById(R.id.pairDeviceButton);
+        Button pairDeviceBtn = (Button) findViewById(R.id.choose_leader_button);
         pairDeviceBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

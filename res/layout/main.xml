@@ -1,24 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-        >
-    <TextView
+              android:layout_height="fill_parent">
+
+    <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Hello World, MainActivity"
-            />
-    <Button
-            android:layout_width="wrap_content"
+            android:orientation="vertical"
+            android:layout_alignParentTop="true">
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/leader"
+                android:id="@+id/leader_label_text_view"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:textSize="30dp"/>
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Device 1"
+                android:id="@+id/leader_text_view"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:textSize="40dp"/>
+        <Button
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:text="@string/choose_leader"
+                android:id="@+id/choose_leader_button"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:padding="20dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/pair_device"
-            android:id="@+id/pairDeviceButton"
-            android:layout_gravity="center_horizontal"/>
-    <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/send_stuff"
-            android:id="@+id/sendStuff" android:layout_gravity="center_horizontal"/>
-</LinearLayout>
+            android:orientation="vertical"
+            android:id="@+id/action_chooser_layout"
+            android:layout_centerVertical="true">
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/choose_action"
+                android:id="@+id/choose_action_label_text_view"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:textSize="30dp"/>
+        <Button
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:text="@string/move"
+                android:id="@+id/move_button"
+                android:layout_gravity="center_horizontal"
+                android:padding="20dp"
+                android:layout_marginTop="20dp"/>
+        <Button
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:text="@string/change_formation"
+                android:id="@+id/change_formation_button"
+                android:layout_gravity="center_horizontal"
+                android:padding="20dp"
+                android:layout_marginTop="20dp"/>
+        <Button
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:text="@string/gather_data"
+                android:id="@+id/gather_data_button"
+                android:layout_gravity="center_horizontal"
+                android:padding="20dp"
+                android:layout_marginTop="20dp"/>
+    </LinearLayout>
+
+</RelativeLayout>
 

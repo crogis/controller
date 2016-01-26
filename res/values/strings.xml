@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Application Label -->
     <string name="app_name">Controller</string>
 
-    <string name="pair_device">Pair Device</string>
+    <string name="leader">Leader</string>
+
+    <string name="choose_leader">Choose Leader</string>
+    <string name="choose_action">Choose Action</string>
+
+    <string name="move">Move</string>
+    <string name="change_formation">Change Formation</string>
+    <string name="gather_data">Gather Data</string>
 
     <string name="send_stuff">Send Stuff</string>
 </resources>
