@@ -1,19 +1,26 @@
 package com.controller;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import com.controller.actions.ChangeFormationActivity;
+import com.controller.actions.GatherDataActivity;
+import com.controller.actions.MoveActivity;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
 
@@ -21,6 +28,8 @@ public class MainActivity extends Activity {
     //Todo add close for input/output stream
 
     private final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
+
+    private SharedPreferences prefs;
 
     private BluetoothDevice pairedDevice;
 
@@ -32,12 +41,85 @@ public class MainActivity extends Activity {
     private InputStream inputStream;
 
     private Button sendStuffBtn;
+    private Button chooseLeaderBtn, moveBtn, changeFormationBtn, gatherDataBtn;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.activity_main);
 
-        setUpPairDeviceButton();
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        setUpChooseLeaderButton();
+        setUpActionButtons();
+    }
+
+    private void setUpChooseLeaderButton() {
+        chooseLeaderBtn = (Button) findViewById(R.id.choose_leader_button);
+        chooseLeaderBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showAlertDialog();
+            }
+        });
+    }
+
+    private void setUpActionButtons() {
+        // Setting up the buttons
+        moveBtn = (Button) findViewById(R.id.move_button);
+        changeFormationBtn = (Button) findViewById(R.id.change_formation_button);
+        gatherDataBtn = (Button) findViewById(R.id.gather_data_button);
+
+        /*
+            Adding listeners to the button so that it will know what action to take when the button is clicked
+            The method startActivity inside the onClick method opens up the new page when the certain action button is clicked
+         */
+        moveBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(MoveActivity.class);
+            }
+        });
+        changeFormationBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(ChangeFormationActivity.class);
+            }
+        });
+        gatherDataBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(GatherDataActivity.class);
+            }
+        });
+    }
+
+    private void startActivity(Class<?> cls) {
+        Intent moveIntent = new Intent(this, cls);
+        startActivity(moveIntent);
+    }
+
+    private void showAlertDialog() {
+        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        dialogBuilder.setTitle("Choose Leader");
+        String[] devices = {"Device 1", "Device 2", "Device 3"};
+        final ArrayAdapter<String> devicesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, devices);
+        dialogBuilder.setAdapter(devicesAdapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                String deviceChosen = devicesAdapter.getItem(i);
+                setParentDevice(deviceChosen);
+            }
+        });
+
+        dialogBuilder.setNegativeButton("Cancel", null);
+        AlertDialog dialog = dialogBuilder.create();
+        dialog.show();
+    }
+
+    private void setParentDevice(String device) {
+        SharedPreferences.Editor e = prefs.edit();
+        e.putString("leaderDevice", device).commit();
     }
 
     private void setUpControlButtons() {
@@ -63,12 +145,9 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void setUpPairDeviceButton() {
-        Button pairDeviceBtn = (Button) findViewById(R.id.choose_leader_button);
-        pairDeviceBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                System.out.println("Clicking!");
+    /*
+
+    System.out.println("Clicking!");
                 if(!btAdapter().isEnabled()) {
                     showBluetoothSettings();
                 }
@@ -88,10 +167,7 @@ public class MainActivity extends Activity {
                         break;
                     }
                 }
-
-            }
-        });
-    }
+     */
 
     private void connect() throws IOException {
         BluetoothSocket socket = pairedDevice.createRfcommSocketToServiceRecord(uuid);
