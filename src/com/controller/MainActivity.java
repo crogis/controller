@@ -16,29 +16,33 @@ import android.widget.Button;
 import com.controller.actions.ChangeFormationActivity;
 import com.controller.actions.GatherDataActivity;
 import com.controller.actions.MoveActivity;
+import com.controller.adapter.PairedDevicesAdapter;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
 
 public class MainActivity extends Activity {
     //Todo add close for input/output stream
 
-    private final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
+    final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
-    private SharedPreferences prefs;
+    SharedPreferences prefs;
 
-    private BluetoothDevice pairedDevice;
+    BluetoothDevice pairedDevice;
+
+    private PairedDevicesAdapter pairedDevicesAdapter;
 
     // For sending raw binary data
-    private OutputStream outputStream;
+    OutputStream outputStream;
     // For strings - remove later
-    private DataOutputStream dataOutputStream;
+    DataOutputStream dataOutputStream;
 
-    private InputStream inputStream;
+    InputStream inputStream;
 
     private Button sendStuffBtn;
     private Button chooseLeaderBtn, moveBtn, changeFormationBtn, gatherDataBtn;
@@ -54,15 +58,32 @@ public class MainActivity extends Activity {
         setUpActionButtons();
     }
 
-    private void setUpChooseLeaderButton() {
-        chooseLeaderBtn = (Button) findViewById(R.id.choose_leader_button);
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if(isBtEnabled()) {
+            chooseLeaderBtn.setText("Choose Leader");
+        } else {
+            chooseLeaderBtn.setText("Turn On Bluetooth");
+        }
+
         chooseLeaderBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showAlertDialog();
+                if(isBtEnabled()) {
+                    showChooseLeaderDialog();
+                } else {
+                    showBluetoothSettings();
+                }
             }
         });
     }
+
+    private void setUpChooseLeaderButton() {
+        chooseLeaderBtn = (Button) findViewById(R.id.choose_leader_button);
+    }
+
 
     private void setUpActionButtons() {
         // Setting up the buttons
@@ -94,43 +115,33 @@ public class MainActivity extends Activity {
         });
     }
 
-    private void startActivity(Class<?> cls) {
+    public void startActivity(Class<?> cls) {
         Intent moveIntent = new Intent(this, cls);
         startActivity(moveIntent);
     }
 
-    private void showAlertDialog() {
+    private void showChooseLeaderDialog() {
+        BluetoothDevice[] pairedDevices = getPairedDevices();
+        pairedDevicesAdapter = new PairedDevicesAdapter(this, R.layout.item_paired_device, pairedDevices);
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         dialogBuilder.setTitle("Choose Leader");
-        String[] devices = {"Device 1", "Device 2", "Device 3"};
-        final ArrayAdapter<String> devicesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, devices);
-        dialogBuilder.setAdapter(devicesAdapter, new DialogInterface.OnClickListener() {
+        dialogBuilder.setAdapter(pairedDevicesAdapter, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                String deviceChosen = devicesAdapter.getItem(i);
-                setParentDevice(deviceChosen);
+                connectToParentDevice(i);
             }
         });
-
         dialogBuilder.setNegativeButton("Cancel", null);
         AlertDialog dialog = dialogBuilder.create();
         dialog.show();
     }
 
-    private void setParentDevice(String device) {
-        SharedPreferences.Editor e = prefs.edit();
-        e.putString("leaderDevice", device).commit();
-    }
+    private void connectToParentDevice(int position) {
+//        SharedPreferences.Editor e = prefs.edit();
+//        e.putString("leaderDevice", device).commit();
+        BluetoothDevice chosenDevice = pairedDevicesAdapter.getItem(position);
 
-    private void setUpControlButtons() {
-//        sendStuffBtn = (Button) findViewById(R.id.sendStuff);
-//        sendStuffBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                writeCommand("Hello World!");
-//            }
-//        });
-//        sendStuffBtn.setEnabled(false);
+        System.out.println("CHOSEN DEVICE " + chosenDevice.getName());
 
     }
 
@@ -145,30 +156,6 @@ public class MainActivity extends Activity {
         }
     }
 
-    /*
-
-    System.out.println("Clicking!");
-                if(!btAdapter().isEnabled()) {
-                    showBluetoothSettings();
-                }
-
-                Set<BluetoothDevice> pairedDevices = btAdapter().getBondedDevices();
-                for(BluetoothDevice device : pairedDevices)
-                {
-                    System.out.println("BT Device " + device.getName());
-                    if(device.getName().contains("Regine")) {
-                        pairedDevice = device;
-                        System.out.println("Device? " + pairedDevice.getName());
-                        try {
-                            connect();
-                        } catch (IOException e) {
-                            System.out.println("Error creating Socket " + e.getMessage());
-                        }
-                        break;
-                    }
-                }
-     */
-
     private void connect() throws IOException {
         BluetoothSocket socket = pairedDevice.createRfcommSocketToServiceRecord(uuid);
         socket.connect();
@@ -181,12 +168,42 @@ public class MainActivity extends Activity {
 //        sendStuffBtn.setEnabled(true);
     }
 
-    private void showBluetoothSettings() {
-        Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-        startActivityForResult(enableBluetooth, 1);
+
+    /*
+        Bluetooth related functions
+     */
+
+    public BluetoothAdapter btAdapter() {
+        return BluetoothAdapter.getDefaultAdapter();
     }
 
-    private BluetoothAdapter btAdapter() {
-        return BluetoothAdapter.getDefaultAdapter();
+    public boolean isBtEnabled() {
+        return btAdapter().isEnabled();
+    }
+
+    public BluetoothDevice[] getPairedDevices() {
+        BluetoothAdapter btAdapter = btAdapter();
+        Set<BluetoothDevice> devices = btAdapter.getBondedDevices();
+        return devices.toArray(new BluetoothDevice[devices.size()]);
+
+//        for(BluetoothDevice device : pairedDevices)
+//        {
+//            System.out.println("BT Device " + device.getName());
+//            if(device.getName().contains("Regine")) {
+//                pairedDevice = device;
+//                System.out.println("Device? " + pairedDevice.getName());
+//                try {
+//                    connect();
+//                } catch (IOException e) {
+//                    System.out.println("Error creating Socket " + e.getMessage());
+//                }
+//                break;
+//            }
+//        }
+    }
+
+    public void showBluetoothSettings() {
+        Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+        startActivityForResult(enableBluetooth, 1);
     }
 }
