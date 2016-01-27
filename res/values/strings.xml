@@ -12,5 +12,9 @@
     <string name="change_formation">Change Formation</string>
     <string name="gather_data">Gather Data</string>
 
+    <string name="straight">Straight</string>
+    <string name="square">Square</string>
+    <string name="diamond">Diamond</string>
+
     <string name="send_stuff">Send Stuff</string>
 </resources>

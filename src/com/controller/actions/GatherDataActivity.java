@@ -12,7 +12,7 @@ public class GatherDataActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_move);
+        setContentView(R.layout.activity_gather_data);
 
         ActionBar actionBar = getActionBar();
         if(actionBar != null) {

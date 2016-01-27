@@ -11,7 +11,7 @@ public class ChangeFormationActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_move);
+        setContentView(R.layout.activity_change_formation);
 
         ActionBar actionBar = getActionBar();
         if(actionBar != null) {
