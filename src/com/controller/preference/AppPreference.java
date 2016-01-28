@@ -15,8 +15,12 @@ public class AppPreference {
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
-    public void setStringPrefs(String key, String value) {
+    public void setStringPref(String key, String value) {
        prefs.edit().putString(key, value).commit();
+    }
+
+    public String findStringPref(String key) {
+        return prefs.getString(key, "-");
     }
 
 }

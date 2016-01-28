@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.controller.actions.ChangeFormationActivity;
 import com.controller.actions.GatherDataActivity;
@@ -46,6 +47,7 @@ public class MainActivity extends Activity {
 
     private Button sendStuffBtn;
     private Button chooseLeaderBtn, moveBtn, changeFormationBtn, gatherDataBtn;
+    private TextView leaderDeviceTextView;
     private ProgressDialog connectingProgressDialog;
 
     AppPreference appPreference;
@@ -59,6 +61,7 @@ public class MainActivity extends Activity {
 
         setUpChooseLeaderButton();
         setUpActionButtons();
+        setUpLeaderTextView();
     }
 
     @Override
@@ -81,6 +84,9 @@ public class MainActivity extends Activity {
                 }
             }
         });
+
+        String leaderName = appPreference.findStringPref(appPreference.LEADER_DEVICE_NAME);
+        leaderDeviceTextView.setText(leaderName);
     }
 
     @Override
@@ -92,7 +98,6 @@ public class MainActivity extends Activity {
     private void setUpChooseLeaderButton() {
         chooseLeaderBtn = (Button) findViewById(R.id.choose_leader_button);
     }
-
 
     private void setUpActionButtons() {
         // Setting up the buttons
@@ -122,6 +127,10 @@ public class MainActivity extends Activity {
                 startActivity(GatherDataActivity.class);
             }
         });
+    }
+
+    private void setUpLeaderTextView() {
+        leaderDeviceTextView = (TextView) findViewById(R.id.leader_text_view);
     }
 
     public void startActivity(Class<?> cls) {
@@ -155,11 +164,21 @@ public class MainActivity extends Activity {
                 try {
                     btSocket = pairedDevice.createRfcommSocketToServiceRecord(uuid);
                     btSocket.connect();
+                    writeStuff();
 
                     connectingProgressDialog.dismiss();
+                    final String deviceName = pairedDevice.getName();
 
-                    appPreference.setStringPrefs(appPreference.LEADER_DEVICE_ADDRESS, pairedDevice.getName());
-                    appPreference.setStringPrefs(appPreference.LEADER_DEVICE_NAME, pairedDevice.getAddress());
+                    appPreference.setStringPref(appPreference.LEADER_DEVICE_NAME, deviceName);
+                    appPreference.setStringPref(appPreference.LEADER_DEVICE_ADDRESS, pairedDevice.getAddress());
+
+                    context.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            leaderDeviceTextView.setText(deviceName);
+                            Toast.makeText(context, "Successfully connected to " + deviceName, Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 } catch (IOException e) {
                     context.runOnUiThread(new Runnable() {
                         @Override
@@ -169,7 +188,7 @@ public class MainActivity extends Activity {
                         }
                     });
 
-                    System.out.println("Unable to connect to device");
+                    System.out.println("Unable to connect to device " + e.getMessage());
                 }
             }
         });
@@ -177,27 +196,13 @@ public class MainActivity extends Activity {
 
     }
 
-    private void writeCommand(String message) {
-        try {
-//            outputStream.write(message.getBytes());
-//            outputStream.flush();
-            dataOutputStream.write(message.getBytes());
-            dataOutputStream.flush();
-        } catch (IOException e) {
-            System.out.println("Unable to write command");
-        }
-    }
-
-    private void connect() throws IOException {
-//        BluetoothSocket socket = pairedDevice.createRfcommSocketToServiceRecord(uuid);
-//        socket.connect();
-
-//        System.out.println("is connected??? " + socket.isConnected());
-
-//        outputStream = socket.getOutputStream();
-//        inputStream = socket.getInputStream();
-//        dataOutputStream = new DataOutputStream(outputStream);
-//        sendStuffBtn.setEnabled(true);
+    private void writeStuff() throws IOException {
+        outputStream = btSocket.getOutputStream();
+        inputStream = btSocket.getInputStream();
+        dataOutputStream = new DataOutputStream(outputStream);
+        String message = "hello i connected!!!";
+        dataOutputStream.write(message.getBytes());
+        dataOutputStream.flush();
     }
 
     private void showConnectingProgressDialog() {
