@@ -2,40 +2,40 @@ package com.controller;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Toast;
 import com.controller.actions.ChangeFormationActivity;
 import com.controller.actions.GatherDataActivity;
 import com.controller.actions.MoveActivity;
 import com.controller.adapter.PairedDevicesAdapter;
+import com.controller.preference.AppPreference;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
 
 public class MainActivity extends Activity {
     //Todo add close for input/output stream
+    //Todo add closing of stuff in onDestroy
 
     final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
-    SharedPreferences prefs;
-
-    BluetoothDevice pairedDevice;
+    private Activity context = this;
 
     private PairedDevicesAdapter pairedDevicesAdapter;
+    private BluetoothSocket btSocket;
+    private BluetoothDevice pairedDevice;
 
     // For sending raw binary data
     OutputStream outputStream;
@@ -46,13 +46,16 @@ public class MainActivity extends Activity {
 
     private Button sendStuffBtn;
     private Button chooseLeaderBtn, moveBtn, changeFormationBtn, gatherDataBtn;
+    private ProgressDialog connectingProgressDialog;
+
+    AppPreference appPreference;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        appPreference = new AppPreference(this);
 
         setUpChooseLeaderButton();
         setUpActionButtons();
@@ -78,6 +81,12 @@ public class MainActivity extends Activity {
                 }
             }
         });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        System.out.println("ON DESTROY");
     }
 
     private void setUpChooseLeaderButton() {
@@ -125,10 +134,13 @@ public class MainActivity extends Activity {
         pairedDevicesAdapter = new PairedDevicesAdapter(this, R.layout.item_paired_device, pairedDevices);
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         dialogBuilder.setTitle("Choose Leader");
+
         dialogBuilder.setAdapter(pairedDevicesAdapter, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                connectToParentDevice(i);
+                pairedDevice = pairedDevicesAdapter.getItem(i);
+                showConnectingProgressDialog();
+                connectToParentDevice();
             }
         });
         dialogBuilder.setNegativeButton("Cancel", null);
@@ -136,12 +148,32 @@ public class MainActivity extends Activity {
         dialog.show();
     }
 
-    private void connectToParentDevice(int position) {
-//        SharedPreferences.Editor e = prefs.edit();
-//        e.putString("leaderDevice", device).commit();
-        BluetoothDevice chosenDevice = pairedDevicesAdapter.getItem(position);
+    private void connectToParentDevice() {
+        Thread thread = new Thread(new Runnable(){
+            @Override
+            public void run(){
+                try {
+                    btSocket = pairedDevice.createRfcommSocketToServiceRecord(uuid);
+                    btSocket.connect();
 
-        System.out.println("CHOSEN DEVICE " + chosenDevice.getName());
+                    connectingProgressDialog.dismiss();
+
+                    appPreference.setStringPrefs(appPreference.LEADER_DEVICE_ADDRESS, pairedDevice.getName());
+                    appPreference.setStringPrefs(appPreference.LEADER_DEVICE_NAME, pairedDevice.getAddress());
+                } catch (IOException e) {
+                    context.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            connectingProgressDialog.dismiss();
+                            Toast.makeText(context, "Unable to connect to " + pairedDevice.getName(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    System.out.println("Unable to connect to device");
+                }
+            }
+        });
+        thread.start();
 
     }
 
@@ -157,21 +189,29 @@ public class MainActivity extends Activity {
     }
 
     private void connect() throws IOException {
-        BluetoothSocket socket = pairedDevice.createRfcommSocketToServiceRecord(uuid);
-        socket.connect();
+//        BluetoothSocket socket = pairedDevice.createRfcommSocketToServiceRecord(uuid);
+//        socket.connect();
 
-        System.out.println("is connected??? " + socket.isConnected());
+//        System.out.println("is connected??? " + socket.isConnected());
 
-        outputStream = socket.getOutputStream();
-        inputStream = socket.getInputStream();
-        dataOutputStream = new DataOutputStream(outputStream);
+//        outputStream = socket.getOutputStream();
+//        inputStream = socket.getInputStream();
+//        dataOutputStream = new DataOutputStream(outputStream);
 //        sendStuffBtn.setEnabled(true);
     }
 
+    private void showConnectingProgressDialog() {
+        connectingProgressDialog = new ProgressDialog(context);
+        connectingProgressDialog.setMessage("Connecting to " + pairedDevice.getName());
+        connectingProgressDialog.setIndeterminate(true);
+        connectingProgressDialog.setCancelable(false);
+        connectingProgressDialog.setCanceledOnTouchOutside(false);
+        connectingProgressDialog.show();
+    }
 
     /*
         Bluetooth related functions
-     */
+    */
 
     public BluetoothAdapter btAdapter() {
         return BluetoothAdapter.getDefaultAdapter();
@@ -185,21 +225,6 @@ public class MainActivity extends Activity {
         BluetoothAdapter btAdapter = btAdapter();
         Set<BluetoothDevice> devices = btAdapter.getBondedDevices();
         return devices.toArray(new BluetoothDevice[devices.size()]);
-
-//        for(BluetoothDevice device : pairedDevices)
-//        {
-//            System.out.println("BT Device " + device.getName());
-//            if(device.getName().contains("Regine")) {
-//                pairedDevice = device;
-//                System.out.println("Device? " + pairedDevice.getName());
-//                try {
-//                    connect();
-//                } catch (IOException e) {
-//                    System.out.println("Error creating Socket " + e.getMessage());
-//                }
-//                break;
-//            }
-//        }
     }
 
     public void showBluetoothSettings() {
