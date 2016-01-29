@@ -19,10 +19,7 @@ import com.controller.actions.MoveActivity;
 import com.controller.adapter.PairedDevicesAdapter;
 import com.controller.preference.AppPreference;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Set;
 import java.util.UUID;
 
@@ -38,12 +35,7 @@ public class MainActivity extends Activity {
     private BluetoothSocket btSocket;
     private BluetoothDevice pairedDevice;
 
-    // For sending raw binary data
-    OutputStream outputStream;
-    // For strings - remove later
-    DataOutputStream dataOutputStream;
-
-    InputStream inputStream;
+    private StreamManager streamManager;
 
     private Button sendStuffBtn;
     private Button chooseLeaderBtn, moveBtn, changeFormationBtn, gatherDataBtn;
@@ -58,10 +50,12 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         appPreference = new AppPreference(this);
+        streamManager = StreamManager.getInstance();
 
         setUpChooseLeaderButton();
         setUpActionButtons();
         setUpLeaderTextView();
+
     }
 
     @Override
@@ -92,7 +86,7 @@ public class MainActivity extends Activity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        System.out.println("ON DESTROY");
+        System.out.println("ON DESTROY MAIN ACTIVITY");
     }
 
     private void setUpChooseLeaderButton() {
@@ -158,20 +152,21 @@ public class MainActivity extends Activity {
     }
 
     private void connectToParentDevice() {
+        final String deviceName = pairedDevice.getName();
+
         Thread thread = new Thread(new Runnable(){
             @Override
             public void run(){
                 try {
                     btSocket = pairedDevice.createRfcommSocketToServiceRecord(uuid);
                     btSocket.connect();
-                    writeStuff();
 
+                    //Initializes the input and output streams
+                    streamManager.initializeStreams(btSocket.getInputStream(), btSocket.getOutputStream());
+                    streamManager.sendCommand("Hello I connected!");
+
+                    setDevicePrefs();
                     connectingProgressDialog.dismiss();
-                    final String deviceName = pairedDevice.getName();
-
-                    appPreference.setStringPref(appPreference.LEADER_DEVICE_NAME, deviceName);
-                    appPreference.setStringPref(appPreference.LEADER_DEVICE_ADDRESS, pairedDevice.getAddress());
-
                     context.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -184,7 +179,7 @@ public class MainActivity extends Activity {
                         @Override
                         public void run() {
                             connectingProgressDialog.dismiss();
-                            Toast.makeText(context, "Unable to connect to " + pairedDevice.getName(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "Unable to connect to " + deviceName, Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -193,16 +188,11 @@ public class MainActivity extends Activity {
             }
         });
         thread.start();
-
     }
 
-    private void writeStuff() throws IOException {
-        outputStream = btSocket.getOutputStream();
-        inputStream = btSocket.getInputStream();
-        dataOutputStream = new DataOutputStream(outputStream);
-        String message = "hello i connected!!!";
-        dataOutputStream.write(message.getBytes());
-        dataOutputStream.flush();
+    private void setDevicePrefs() {
+        appPreference.setStringPref(appPreference.LEADER_DEVICE_NAME, pairedDevice.getName());
+        appPreference.setStringPref(appPreference.LEADER_DEVICE_ADDRESS, pairedDevice.getAddress());
     }
 
     private void showConnectingProgressDialog() {
