@@ -1,62 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent">
+              style="@style/fillParent">
 
     <TableLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            style="@style/fillParentWidth"
             android:layout_centerInParent="true">
         <TableRow
-                android:layout_width="fill_parent"
                 android:gravity="center">
             <ImageButton
-                    android:layout_width="110dp"
-                    android:layout_height="110dp"
+                    style="@style/arrowsImgBtn"
                     android:id="@+id/up_image_button"
-                    android:src="@drawable/ic_arrow_up_black"
-                    android:scaleType="fitCenter"
-                    android:background="@drawable/gray_button"
-                    android:padding="10dp"/>
+                    android:src="@drawable/ic_arrow_up_black"/>
         </TableRow>
 
         <TableRow
-                android:layout_width="fill_parent"
                 android:gravity="center">
             <ImageButton
-                    android:layout_width="110dp"
-                    android:layout_height="110dp"
+                    style="@style/arrowsImgBtn"
                     android:id="@+id/left_image_button"
-                    android:src="@drawable/ic_arrow_left_black"
-                    android:scaleType="fitCenter"
-                    android:background="@drawable/gray_button"
-                    android:padding="10dp"/>
+                    android:src="@drawable/ic_arrow_left_black"/>
             <ImageButton
                     android:layout_width="110dp"
                     android:layout_height="110dp"
                     android:visibility="invisible"/>
             <ImageButton
-                    android:layout_width="110dp"
-                    android:layout_height="110dp"
+                    style="@style/arrowsImgBtn"
                     android:id="@+id/right_image_button"
-                    android:src="@drawable/ic_arrow_right_black"
-                    android:scaleType="fitCenter"
-                    android:background="@drawable/gray_button"
-                    android:padding="10dp"/>
+                    android:src="@drawable/ic_arrow_right_black"/>
         </TableRow>
 
         <TableRow
-                android:layout_width="fill_parent"
                 android:gravity="center">
             <ImageButton
-                    android:layout_width="110dp"
-                    android:layout_height="110dp"
+                    style="@style/arrowsImgBtn"
                     android:id="@+id/down_image_button"
-                    android:src="@drawable/ic_arrow_down_black"
-                    android:scaleType="fitCenter"
-                    android:background="@drawable/gray_button"
-                    android:padding="10dp"/>
+                    android:src="@drawable/ic_arrow_down_black"/>
         </TableRow>
     </TableLayout>
 </RelativeLayout>

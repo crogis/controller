@@ -1,81 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent">
+              style="@style/fillParent">
     <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
+            style="@style/fillParentWidth"
             android:id="@+id/action_chooser_layout"
             android:layout_centerVertical="true">
         <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/headerTextView"
                 android:text="@string/choose_action"
                 android:id="@+id/choose_action_label_text_view"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="20dp"
-                android:textSize="25dp"/>
+                android:layout_marginTop="20dp"/>
         <Button
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
+                style="@style/menuBtn"
                 android:text="@string/move"
-                android:id="@+id/move_button"
-                android:layout_gravity="center_horizontal"
-                android:padding="15dp"
-                android:layout_marginTop="15dp"
-                android:background="@drawable/gray_button"/>
+                android:id="@+id/move_button"/>
         <Button
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
+                style="@style/menuBtn"
                 android:text="@string/change_formation"
-                android:id="@+id/change_formation_button"
-                android:layout_gravity="center_horizontal"
-                android:padding="15dp"
-                android:layout_marginTop="15dp"
-                android:background="@drawable/gray_button"/>
+                android:id="@+id/change_formation_button"/>
         <Button
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
+                style="@style/menuBtn"
                 android:text="@string/gather_data"
-                android:id="@+id/gather_data_button"
-                android:layout_gravity="center_horizontal"
-                android:padding="15dp"
-                android:layout_marginTop="15dp"
-                android:background="@drawable/gray_button"/>
+                android:id="@+id/gather_data_button"/>
     </LinearLayout>
 
     <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
+            style="@style/fillParentWidth"
             android:layout_above="@id/action_chooser_layout">
         <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/headerTextView"
                 android:text="@string/leader"
                 android:id="@+id/leader_label_text_view"
-                android:layout_gravity="center_horizontal"
                 android:textSize="18dp"/>
 
         <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/headerTextView"
                 android:text="-"
                 android:id="@+id/leader_text_view"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="5dp"
-                android:textSize="25dp"/>
+                android:layout_marginTop="5dp"/>
         <Button
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
+                style="@style/menuBtn"
                 android:text="@string/choose_leader"
-                android:id="@+id/choose_leader_button"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="15dp"
-                android:padding="15dp"
-                android:background="@drawable/gray_button"/>
+                android:id="@+id/choose_leader_button"/>
     </LinearLayout>
 
 </RelativeLayout>

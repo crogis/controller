@@ -5,34 +5,19 @@
               android:layout_height="match_parent">
 
     <Button
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
+            style="@style/formationBtn"
             android:text="@string/square"
-            android:id="@+id/square_button"
-            android:layout_centerInParent="true"
-            android:layout_marginBottom="20dp"
-            android:padding="15dp"
-            android:background="@drawable/gray_button"/>
+            android:id="@+id/square_button"/>
 
     <Button
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
+            style="@style/formationBtn"
             android:text="@string/straight"
             android:id="@+id/straight_button"
-            android:layout_above="@id/square_button"
-            android:layout_centerInParent="true"
-            android:layout_marginBottom="20dp"
-            android:padding="15dp"
-            android:background="@drawable/gray_button"/>
+            android:layout_above="@id/square_button"/>
 
     <Button
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
+            style="@style/formationBtn"
             android:text="@string/diamond"
             android:id="@+id/diamond_button"
-            android:layout_below="@id/square_button"
-            android:layout_centerInParent="true"
-            android:layout_marginBottom="20dp"
-            android:padding="15dp"
-            android:background="@drawable/gray_button"/>
+            android:layout_below="@id/square_button"/>
 </RelativeLayout>

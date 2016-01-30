@@ -3,4 +3,51 @@
     <style name="ControllerApplicationStyle" parent="android:style/Theme.Holo.Light">
         <item name="android:typeface">sans</item>
     </style>
+
+    <!-- Layout styles -->
+    <style name="fillParent">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="wrapContent">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="fillParentWidth" parent="fillParent">
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <!-- Specific styles for elements -->
+
+    <style name="menuBtn" parent="wrapContent">
+        <item name="android:layout_width">200dp</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:padding">15dp</item>
+        <item name="android:layout_marginTop">15dp</item>
+        <item name="android:background">@drawable/gray_button</item>
+    </style>
+
+    <style name="headerTextView" parent="wrapContent">
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:textSize">25dp</item>
+    </style>
+
+    <style name="arrowsImgBtn">
+        <item name="android:layout_width">110dp</item>
+        <item name="android:layout_height">110dp</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:background">@drawable/gray_button</item>
+        <item name="android:padding">10dp</item>
+    </style>
+
+    <style name="formationBtn" parent="wrapContent">
+        <item name="android:layout_width">120dp</item>
+        <item name="android:layout_marginBottom">20dp</item>
+        <item name="android:padding">15dp</item>
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:background">@drawable/gray_button</item>
+    </style>
 </resources>
