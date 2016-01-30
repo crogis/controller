@@ -32,9 +32,12 @@ public class StreamManager {
         dataOutputStream = new DataOutputStream(outputStream);
     }
 
-    public void sendCommand(String command) throws IOException {
-        dataOutputStream.writeBytes(command + "\n");
-        dataOutputStream.flush();
+    public void sendCommand(int command) throws IOException {
+        outputStream.write(command);
+        outputStream.flush();
+
+//        dataOutputStream.writeBytes(command + "\n");
+//        dataOutputStream.flush();
         System.out.println("Sending command " + command);
     }
 }

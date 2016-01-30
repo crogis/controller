@@ -163,7 +163,7 @@ public class MainActivity extends Activity {
 
                     //Initializes the input and output streams
                     streamManager.initializeStreams(btSocket.getInputStream(), btSocket.getOutputStream());
-                    streamManager.sendCommand("Hello I connected!");
+                    streamManager.sendCommand(1);
 
                     setDevicePrefs();
                     connectingProgressDialog.dismiss();

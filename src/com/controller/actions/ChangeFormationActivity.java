@@ -3,11 +3,17 @@ package com.controller.actions;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 import com.controller.R;
+import com.controller.StreamManager;
 
 public class ChangeFormationActivity extends Activity {
+
+    private StreamManager streamManager;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,6 +25,10 @@ public class ChangeFormationActivity extends Activity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setTitle("Change Formation");
         }
+
+        streamManager = StreamManager.getInstance();
+
+        setUpChangeFormationButtons();
     }
 
     @Override
@@ -28,10 +38,40 @@ public class ChangeFormationActivity extends Activity {
                 android.R.id.home refers to the back button
              */
             case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
+                this.finish();
                 return true;
             default:
                 return false;
         }
+    }
+
+    private void setUpChangeFormationButtons() {
+        setActionOnClickListener(R.id.straight_button, 5);
+        setActionOnClickListener(R.id.square_button, 7);
+        setActionOnClickListener(R.id.diamond_button, 9);
+    }
+
+    private void setActionOnClickListener(int resId, final int command) {
+        Button button = (Button) findViewById(resId);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    streamManager.sendCommand(command);
+                } catch (Exception e) {
+                    showUnableToConnectToast();
+                }
+            }
+        });
+    }
+
+    private void showUnableToConnectToast() {
+        Toast.makeText(this, "Unable to connect to device", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        System.out.println("ON DESTROY CHANGE FORMATION ACTIVITY");
     }
 }

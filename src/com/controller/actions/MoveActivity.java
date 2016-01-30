@@ -13,8 +13,6 @@ import com.controller.StreamManager;
 
 public class MoveActivity extends Activity {
 
-    private ImageButton upImgBtn, downImgBtn, leftImgBtn, rightImgBtn;
-
     private StreamManager streamManager;
 
     @Override
@@ -53,51 +51,20 @@ public class MoveActivity extends Activity {
         }
     }
 
-
     private void setUpControllerButtons() {
-        upImgBtn = (ImageButton) findViewById(R.id.up_image_button);
-        downImgBtn = (ImageButton) findViewById(R.id.down_image_button);
-        leftImgBtn = (ImageButton) findViewById(R.id.left_image_button);
-        rightImgBtn = (ImageButton) findViewById(R.id.right_image_button);
+        setActionOnClickListener(R.id.up_image_button, 2);
+        setActionOnClickListener(R.id.left_image_button, 4);
+        setActionOnClickListener(R.id.right_image_button, 6);
+        setActionOnClickListener(R.id.down_image_button, 8);
+    }
 
-        upImgBtn.setOnClickListener(new View.OnClickListener() {
+    private void setActionOnClickListener(int resId, final int command) {
+        ImageButton imgBtn = (ImageButton) findViewById(resId);
+        imgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 try {
-                    streamManager.sendCommand("2");
-                } catch (Exception e) {
-                    showUnableToConnectToast();
-                }
-            }
-        });
-
-        downImgBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    streamManager.sendCommand("8");
-                } catch (Exception e) {
-                    showUnableToConnectToast();
-                }
-            }
-        });
-
-        leftImgBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    streamManager.sendCommand("4");
-                } catch (Exception e) {
-                    showUnableToConnectToast();
-                }
-            }
-        });
-
-        rightImgBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    streamManager.sendCommand("6");
+                    streamManager.sendCommand(command);
                 } catch (Exception e) {
                     showUnableToConnectToast();
                 }
