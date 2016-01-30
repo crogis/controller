@@ -19,6 +19,7 @@ public class GatherDataActivity extends Activity {
             // Setting this to true enables the back button in the Action Bar
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setTitle("Gather Data");
+            actionBar.setIcon(android.R.color.transparent);
         }
     }
 
@@ -29,7 +30,7 @@ public class GatherDataActivity extends Activity {
                 android.R.id.home refers to the back button
              */
             case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
+                this.finish();
                 return true;
             default:
                 return false;

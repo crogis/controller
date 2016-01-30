@@ -16,7 +16,8 @@
                     android:layout_height="110dp"
                     android:id="@+id/up_image_button"
                     android:src="@drawable/ic_arrow_up_black"
-                    android:scaleType="fitCenter"/>
+                    android:scaleType="fitCenter"
+                    android:background="@drawable/gray_button"/>
         </TableRow>
 
         <TableRow
@@ -27,7 +28,8 @@
                     android:layout_height="110dp"
                     android:id="@+id/left_image_button"
                     android:src="@drawable/ic_arrow_left_black"
-                    android:scaleType="fitCenter"/>
+                    android:scaleType="fitCenter"
+                    android:background="@drawable/gray_button"/>
             <ImageButton
                     android:layout_width="110dp"
                     android:layout_height="110dp"
@@ -37,7 +39,8 @@
                     android:layout_height="110dp"
                     android:id="@+id/right_image_button"
                     android:src="@drawable/ic_arrow_right_black"
-                    android:scaleType="fitCenter"/>
+                    android:scaleType="fitCenter"
+                    android:background="@drawable/gray_button"/>
         </TableRow>
 
         <TableRow
@@ -48,7 +51,8 @@
                     android:layout_height="110dp"
                     android:id="@+id/down_image_button"
                     android:src="@drawable/ic_arrow_down_black"
-                    android:scaleType="fitCenter"/>
+                    android:scaleType="fitCenter"
+                    android:background="@drawable/gray_button"/>
         </TableRow>
     </TableLayout>
 </RelativeLayout>

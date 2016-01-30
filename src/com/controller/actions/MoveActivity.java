@@ -25,6 +25,7 @@ public class MoveActivity extends Activity {
             // Setting this to true enables the back button in the Action Bar
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setTitle("Move");
+            actionBar.setIcon(android.R.color.transparent);
         }
 
         streamManager = StreamManager.getInstance();

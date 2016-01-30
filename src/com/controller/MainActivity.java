@@ -1,5 +1,6 @@
 package com.controller;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -49,13 +50,18 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ActionBar actionBar = getActionBar();
+        if(actionBar != null) {
+            actionBar.setTitle("");
+            actionBar.setIcon(android.R.color.transparent);
+        }
+
         appPreference = new AppPreference(this);
         streamManager = StreamManager.getInstance();
 
         setUpChooseLeaderButton();
         setUpActionButtons();
         setUpLeaderTextView();
-
     }
 
     @Override

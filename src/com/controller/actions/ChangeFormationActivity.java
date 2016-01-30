@@ -24,6 +24,7 @@ public class ChangeFormationActivity extends Activity {
             // Setting this to true enables the back button in the Action Bar
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setTitle("Change Formation");
+            actionBar.setIcon(android.R.color.transparent);
         }
 
         streamManager = StreamManager.getInstance();
