@@ -1,0 +1,5 @@
+Sources:
+
+Application Icon - https://design.google.com/icons/#ic_sync
+Application Icon edited using https://romannurik.github.io/AndroidAssetStudio/icons-generic.html
+Four Directional Arrows - https://www.iconfinder.com/search/?q=arrow

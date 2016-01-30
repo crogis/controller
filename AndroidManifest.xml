@@ -11,7 +11,8 @@
 
     <application android:label="@string/app_name"
                  android:icon="@drawable/ic_controller"
-                 android:theme="@android:style/Theme.Holo.Light">
+                 android:theme="@style/ControllerApplicationStyle"
+                 android:name=".ControllerApplication">
         <activity android:name=".MainActivity"
                   android:label="@string/app_name">
             <intent-filter>

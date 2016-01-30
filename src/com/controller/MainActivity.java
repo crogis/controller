@@ -9,6 +9,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -48,13 +49,14 @@ public class MainActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
         ActionBar actionBar = getActionBar();
         if(actionBar != null) {
             actionBar.setTitle("");
             actionBar.setIcon(android.R.color.transparent);
         }
+
+        setContentView(R.layout.activity_main);
 
         appPreference = new AppPreference(this);
         streamManager = StreamManager.getInstance();
