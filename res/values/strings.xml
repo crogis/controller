@@ -5,6 +5,8 @@
 
     <string name="leader">Leader</string>
 
+    <string name="reconnect">Reconnect</string>
+
     <string name="choose_leader">Choose Leader</string>
     <string name="choose_action">Choose Action</string>
 

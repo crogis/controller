@@ -11,6 +11,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -49,14 +50,17 @@ public class MainActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
         ActionBar actionBar = getActionBar();
         if(actionBar != null) {
-            actionBar.setTitle("");
-            actionBar.setIcon(android.R.color.transparent);
+            actionBar.setDisplayShowHomeEnabled(false);
+            actionBar.setDisplayShowTitleEnabled(false);
+            LayoutInflater layoutInflater = LayoutInflater.from(this);
+            View view = layoutInflater.inflate(R.layout.action_bar_custom, null);
+            actionBar.setCustomView(view);
+            actionBar.setDisplayShowCustomEnabled(true);
         }
-
-        setContentView(R.layout.activity_main);
 
         appPreference = new AppPreference(this);
         streamManager = StreamManager.getInstance();
