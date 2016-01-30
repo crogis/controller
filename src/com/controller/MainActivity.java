@@ -115,7 +115,10 @@ public class MainActivity extends Activity {
             });
 
             actionBar.setCustomView(view);
-            actionBar.setDisplayShowCustomEnabled(!leaderName.isEmpty() && pairedDevice != null && !bluetoothManager.isConnected());
+            actionBar.setDisplayShowCustomEnabled(!leaderName.isEmpty() &&
+                                                  !leaderAddress.isEmpty() &&
+                                                  pairedDevice != null &&
+                                                  !bluetoothManager.isConnected());
         }
     }
 
@@ -252,9 +255,14 @@ public class MainActivity extends Activity {
     }
 
     private void showReconnectButton() {
+        String leaderName = appPreference.findStringPref(appPreference.LEADER_DEVICE_NAME);
+        String leaderAddress = appPreference.findStringPref(appPreference.LEADER_DEVICE_ADDRESS);
         ActionBar actionBar = getActionBar();
         if(actionBar != null) {
-            actionBar.setDisplayShowCustomEnabled(!bluetoothManager.isConnected());
+            actionBar.setDisplayShowCustomEnabled(!leaderName.isEmpty() &&
+                                                  !leaderAddress.isEmpty() &&
+                                                  pairedDevice != null &&
+                                                  !bluetoothManager.isConnected());
         }
     }
 
