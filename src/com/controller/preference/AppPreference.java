@@ -20,7 +20,7 @@ public class AppPreference {
     }
 
     public String findStringPref(String key) {
-        return prefs.getString(key, "-");
+        return prefs.getString(key, "");
     }
 
 }

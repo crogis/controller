@@ -9,7 +9,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,10 +37,9 @@ public class MainActivity extends Activity {
     private BluetoothSocket btSocket;
     private BluetoothDevice pairedDevice;
 
-    private StreamManager streamManager;
+    private BluetoothManager bluetoothManager;
 
-    private Button sendStuffBtn;
-    private Button chooseLeaderBtn, moveBtn, changeFormationBtn, gatherDataBtn;
+    private Button chooseLeaderBtn, moveBtn, changeFormationBtn, gatherDataBtn, reconnectBtn;
     private TextView leaderDeviceTextView;
     private ProgressDialog connectingProgressDialog;
 
@@ -52,18 +50,8 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ActionBar actionBar = getActionBar();
-        if(actionBar != null) {
-            actionBar.setDisplayShowHomeEnabled(false);
-            actionBar.setDisplayShowTitleEnabled(false);
-            LayoutInflater layoutInflater = LayoutInflater.from(this);
-            View view = layoutInflater.inflate(R.layout.action_bar_custom, null);
-            actionBar.setCustomView(view);
-            actionBar.setDisplayShowCustomEnabled(true);
-        }
-
         appPreference = new AppPreference(this);
-        streamManager = StreamManager.getInstance();
+        bluetoothManager = BluetoothManager.getInstance();
 
         setUpChooseLeaderButton();
         setUpActionButtons();
@@ -74,25 +62,71 @@ public class MainActivity extends Activity {
     public void onResume() {
         super.onResume();
 
-        if(isBtEnabled()) {
-            chooseLeaderBtn.setText("Choose Leader");
-        } else {
-            chooseLeaderBtn.setText("Turn On Bluetooth");
+        if(!isBtEnabled()) {
+            showBluetoothSettings();
         }
 
-        chooseLeaderBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(isBtEnabled()) {
-                    showChooseLeaderDialog();
-                } else {
-                    showBluetoothSettings();
-                }
-            }
-        });
+        /*
+            Resetting pairedDevice to null because every time the app opens, it should not access the old value of the
+            paired device when the activity was paused (meaning you press the home button on your device,
+            so the application is paused, not exited)
+         */
+        pairedDevice = null;
 
         String leaderName = appPreference.findStringPref(appPreference.LEADER_DEVICE_NAME);
-        leaderDeviceTextView.setText(leaderName);
+        String leaderAddress = appPreference.findStringPref(appPreference.LEADER_DEVICE_ADDRESS);
+
+        BluetoothDevice[] pairedDevices = getPairedDevices();
+        for (BluetoothDevice btDevice: pairedDevices) {
+            if( btDevice.getName().equals(leaderName) && btDevice.getAddress().equals(leaderAddress)) {
+                System.out.println("Paired device " + btDevice);
+                pairedDevice = btDevice;
+                break;
+            }
+        }
+
+        /*
+            pairedDevice will be null in 2 instances
+            1. App is newly opened
+            2. User unpairs the chosen leader device (that's why there is a checker if the leaderName is originally empty or not)
+         */
+        if(pairedDevice == null) {
+            leaderDeviceTextView.setText("-");
+            /*
+                This will happen if the user unpairs the chosen leader device.
+                But this should not happen unless you manually unpair your device from the Bluetooth settings.
+             */
+            if(!leaderName.isEmpty()) {
+                Toast.makeText(this, "Unable to find chosen leader device. Please choose another one.", Toast.LENGTH_LONG).show();
+            }
+        } else {
+            leaderDeviceTextView.setText(leaderName);
+        }
+
+
+        ActionBar actionBar = getActionBar();
+        if(actionBar != null) {
+            actionBar.setDisplayShowHomeEnabled(false);
+            actionBar.setDisplayShowTitleEnabled(false);
+
+            LayoutInflater layoutInflater = LayoutInflater.from(this);
+            View view = layoutInflater.inflate(R.layout.action_bar_custom, null);
+            reconnectBtn = (Button) view.findViewById(R.id.reconnect_button);
+            reconnectBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                }
+            });
+
+            actionBar.setCustomView(view);
+            actionBar.setDisplayShowCustomEnabled(!leaderName.isEmpty() && pairedDevice != null);
+        }
+
+        System.out.println("bt socket " + btSocket);
+        if(btSocket != null) {
+            System.out.println("BT SOCKET CONNECTED ON RESUME " + btSocket.isConnected());
+        }
     }
 
     @Override
@@ -103,6 +137,12 @@ public class MainActivity extends Activity {
 
     private void setUpChooseLeaderButton() {
         chooseLeaderBtn = (Button) findViewById(R.id.choose_leader_button);
+        chooseLeaderBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showChooseLeaderDialog();
+            }
+        });
     }
 
     private void setUpActionButtons() {
@@ -153,9 +193,9 @@ public class MainActivity extends Activity {
         dialogBuilder.setAdapter(pairedDevicesAdapter, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                pairedDevice = pairedDevicesAdapter.getItem(i);
-                showConnectingProgressDialog();
-                connectToParentDevice();
+            pairedDevice = pairedDevicesAdapter.getItem(i);
+            showConnectingProgressDialog();
+            connectToParentDevice();
             }
         });
         dialogBuilder.setNegativeButton("Cancel", null);
@@ -166,6 +206,10 @@ public class MainActivity extends Activity {
     private void connectToParentDevice() {
         final String deviceName = pairedDevice.getName();
 
+//        if(btSocket != null) {
+//            System.out.println("BT SOCKET IS CONNECTED?? " + btSocket.isConnected());
+//        }
+
         Thread thread = new Thread(new Runnable(){
             @Override
             public void run(){
@@ -174,18 +218,14 @@ public class MainActivity extends Activity {
                     btSocket.connect();
 
                     //Initializes the input and output streams
-                    streamManager.initializeStreams(btSocket.getInputStream(), btSocket.getOutputStream());
-                    streamManager.sendCommand(1);
+                    bluetoothManager.initializeStreams(btSocket.getInputStream(), btSocket.getOutputStream());
+                    bluetoothManager.sendCommand(1);
 
                     setDevicePrefs();
                     connectingProgressDialog.dismiss();
-                    context.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            leaderDeviceTextView.setText(deviceName);
-                            Toast.makeText(context, "Successfully connected to " + deviceName, Toast.LENGTH_SHORT).show();
-                        }
-                    });
+
+                    //calls made to the main thread
+                    onSuccessfulConnection();
                 } catch (IOException e) {
                     context.runOnUiThread(new Runnable() {
                         @Override
@@ -195,6 +235,7 @@ public class MainActivity extends Activity {
                         }
                     });
 
+                    System.out.println("Legit error " + e);
                     System.out.println("Unable to connect to device " + e.getMessage());
                 }
             }
@@ -216,6 +257,22 @@ public class MainActivity extends Activity {
         connectingProgressDialog.show();
     }
 
+    // Calls that need to be made on the main thread
+    private void onSuccessfulConnection() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String deviceName = pairedDevice.getName();
+                leaderDeviceTextView.setText(deviceName);
+
+                ActionBar actionBar = getActionBar();
+                if(actionBar != null)
+                    actionBar.setDisplayShowCustomEnabled(true);
+
+                Toast.makeText(context, "Successfully connected to " + deviceName, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
     /*
         Bluetooth related functions
     */

@@ -8,11 +8,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 import com.controller.R;
-import com.controller.StreamManager;
+import com.controller.BluetoothManager;
 
 public class ChangeFormationActivity extends Activity {
 
-    private StreamManager streamManager;
+    private BluetoothManager bluetoothManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -27,7 +27,7 @@ public class ChangeFormationActivity extends Activity {
             actionBar.setIcon(android.R.color.transparent);
         }
 
-        streamManager = StreamManager.getInstance();
+        bluetoothManager = BluetoothManager.getInstance();
 
         setUpChangeFormationButtons();
     }
@@ -57,9 +57,8 @@ public class ChangeFormationActivity extends Activity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    streamManager.sendCommand(command);
-                } catch (Exception e) {
+                boolean success = bluetoothManager.sendCommand(command);
+                if(!success) {
                     showUnableToConnectToast();
                 }
             }

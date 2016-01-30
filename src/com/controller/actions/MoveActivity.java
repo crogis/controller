@@ -8,12 +8,12 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import com.controller.R;
-import com.controller.StreamManager;
+import com.controller.BluetoothManager;
 
 
 public class MoveActivity extends Activity {
 
-    private StreamManager streamManager;
+    private BluetoothManager bluetoothManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -28,7 +28,7 @@ public class MoveActivity extends Activity {
             actionBar.setIcon(android.R.color.transparent);
         }
 
-        streamManager = StreamManager.getInstance();
+        bluetoothManager = BluetoothManager.getInstance();
 
         setUpControllerButtons();
     }
@@ -64,9 +64,9 @@ public class MoveActivity extends Activity {
         imgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    streamManager.sendCommand(command);
-                } catch (Exception e) {
+
+                boolean success = bluetoothManager.sendCommand(command);
+                if(!success) {
                     showUnableToConnectToast();
                 }
             }
