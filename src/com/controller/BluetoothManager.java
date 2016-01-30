@@ -1,6 +1,13 @@
 package com.controller;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
+
 import java.io.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 /*
     This class handles all the bluetooth connections (sending and receiving)
@@ -11,9 +18,13 @@ public class BluetoothManager {
 
     private static BluetoothManager bluetoothManager = new BluetoothManager();
 
+    private static UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
+
     // For sending raw binary data
     private static OutputStream outputStream;
     private static InputStream inputStream;
+
+    private static BluetoothSocket bluetoothSocket;
 
     // For strings - remove later
     private static DataOutputStream dataOutputStream;
@@ -26,36 +37,94 @@ public class BluetoothManager {
 
     private BluetoothManager(){ }
 
+    /**
+     * @return single instance of BluetoothManager
+     */
     public static BluetoothManager getInstance( ) {
         return bluetoothManager;
     }
 
-    public void initializeStreams(InputStream is, OutputStream os) {
-        inputStream = is;
-        outputStream = os;
-        dataInputStream = new DataInputStream(inputStream);
-        dataOutputStream = new DataOutputStream(outputStream);
+    private static BluetoothAdapter btAdapter() {
+        return BluetoothAdapter.getDefaultAdapter();
     }
 
-    public void resetStreams() {
-        inputStream = null;
-        outputStream = null;
-        dataInputStream = null;
-        dataOutputStream = null;
+    public boolean isBtEnabled() {
+        return btAdapter().isEnabled();
+    }
+
+    public BluetoothDevice[] getPairedDevices() {
+        Set<BluetoothDevice> devices = getBondedDevices();
+        return devices.toArray(new BluetoothDevice[devices.size()]);
+    }
+
+    public BluetoothDevice[] getPairedDevices(BluetoothDevice remove) {
+        Set<BluetoothDevice> devices = new HashSet<BluetoothDevice>(getBondedDevices());
+        devices.remove(remove);
+        return devices.toArray(new BluetoothDevice[devices.size()]);
+    }
+
+    private Set<BluetoothDevice> getBondedDevices() {
+       return btAdapter().getBondedDevices();
+    }
+
+    public boolean initializeBluetoothSocket(BluetoothDevice btDevice) { //throws IOException {
+        try {
+            bluetoothSocket = btDevice.createRfcommSocketToServiceRecord(uuid);
+            bluetoothSocket.connect();
+
+            //Initializes the input and output streams
+            initializeStreams(bluetoothSocket.getInputStream(), bluetoothSocket.getOutputStream());
+
+            //Sends command device has connected to paired device
+            sendCommand(1);
+            return true;
+        } catch (Exception e) {
+            System.out.println("Unable to connect to device " + e.getMessage());
+            closeBluetoothConnection();
+            return false;
+        }
+
+    }
+
+    private void initializeStreams(InputStream is, OutputStream os) {
+        inputStream = is;
+        outputStream = os;
     }
 
     public boolean sendCommand(int command) {
         try {
             outputStream.write(command);
             outputStream.flush();
-//        dataOutputStream.writeBytes(command + "\n");
-//        dataOutputStream.flush();
             System.out.println("Sending command " + command);
             return true;
         } catch (Exception e) {
             System.out.println("Error sending command " + e);
-            resetStreams();
+            closeBluetoothConnection();
             return false;
         }
+    }
+
+    public boolean isConnected() {
+        return bluetoothSocket != null && bluetoothSocket.isConnected();
+    }
+
+    public void closeBluetoothConnection() {
+        try {
+            if(inputStream != null) {
+                inputStream.close();
+            }
+            if(outputStream != null) {
+                outputStream.close();
+            }
+            if(bluetoothSocket != null) {
+                bluetoothSocket.close();
+            }
+        } catch (Exception e) {
+            System.out.println("Error in closing streams/socket " + e.getMessage());
+        }
+
+        inputStream = null;
+        outputStream = null;
+        bluetoothSocket = null;
     }
 }
