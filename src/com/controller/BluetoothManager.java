@@ -57,7 +57,7 @@ public class BluetoothManager {
         return devices.toArray(new BluetoothDevice[devices.size()]);
     }
 
-    public BluetoothDevice[] getPairedDevices(BluetoothDevice remove) {
+    public BluetoothDevice[] getPairedDevicesWithoutDevice(BluetoothDevice remove) {
         Set<BluetoothDevice> devices = new HashSet<BluetoothDevice>(getBondedDevices());
         devices.remove(remove);
         return devices.toArray(new BluetoothDevice[devices.size()]);

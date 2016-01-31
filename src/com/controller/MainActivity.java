@@ -179,21 +179,27 @@ public class MainActivity extends Activity {
     }
 
     private void showChooseLeaderDialog() {
-        BluetoothDevice[] pairedDevices = bluetoothManager.getPairedDevices(pairedDevice);
-        pairedDevicesAdapter = new PairedDevicesAdapter(this, R.layout.item_paired_device, pairedDevices);
-        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-        dialogBuilder.setTitle("Choose Leader");
+        BluetoothDevice[] pairedDevices = bluetoothManager.getPairedDevicesWithoutDevice(pairedDevice);
+        if(pairedDevices.length == 0 && pairedDevice == null) {
+            Toast.makeText(this, "No paired devices", Toast.LENGTH_SHORT).show();
+        } else if (pairedDevices.length == 0 && pairedDevice != null) {
+            Toast.makeText(this, "No other paired devices", Toast.LENGTH_SHORT).show();
+        } else if (pairedDevices.length > 0) {
+            pairedDevicesAdapter = new PairedDevicesAdapter(this, R.layout.item_paired_device, pairedDevices);
+            final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+            dialogBuilder.setTitle("Choose Leader");
 
-        dialogBuilder.setAdapter(pairedDevicesAdapter, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-            pairedDevice = pairedDevicesAdapter.getItem(i);
-            connectToParentDevice();
-            }
-        });
-        dialogBuilder.setNegativeButton("Cancel", null);
-        AlertDialog dialog = dialogBuilder.create();
-        dialog.show();
+            dialogBuilder.setAdapter(pairedDevicesAdapter, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    pairedDevice = pairedDevicesAdapter.getItem(i);
+                    connectToParentDevice();
+                }
+            });
+            dialogBuilder.setNegativeButton("Cancel", null);
+            AlertDialog dialog = dialogBuilder.create();
+            dialog.show();
+        }
     }
 
     private void connectToParentDevice() {
@@ -250,6 +256,7 @@ public class MainActivity extends Activity {
             public void run() {
                 showReconnectButton();
                 Toast.makeText(context, "Unable to connect to " + pairedDevice.getName(), Toast.LENGTH_SHORT).show();
+                pairedDevice = null;
             }
         });
     }
