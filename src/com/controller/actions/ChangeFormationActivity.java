@@ -68,10 +68,4 @@ public class ChangeFormationActivity extends Activity {
     private void showUnableToConnectToast() {
         Toast.makeText(this, "Unable to connect to device", Toast.LENGTH_SHORT).show();
     }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        System.out.println("ON DESTROY CHANGE FORMATION ACTIVITY");
-    }
 }

@@ -3,6 +3,7 @@ package com.controller;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.util.Log;
 
 import java.io.*;
 import java.util.HashSet;
@@ -29,6 +30,8 @@ public class BluetoothManager {
     // For strings - remove later
     private static DataOutputStream dataOutputStream;
     private static DataInputStream dataInputStream;
+
+    private String TAG = "BluetoothManager";
 
     /*
      * A private Constructor prevents any other
@@ -67,7 +70,7 @@ public class BluetoothManager {
        return btAdapter().getBondedDevices();
     }
 
-    public boolean initializeBluetoothSocket(BluetoothDevice btDevice) { //throws IOException {
+    public boolean initializeBluetoothSocket(BluetoothDevice btDevice) {
         try {
             bluetoothSocket = btDevice.createRfcommSocketToServiceRecord(uuid);
             bluetoothSocket.connect();
@@ -79,7 +82,7 @@ public class BluetoothManager {
             sendCommand(1);
             return true;
         } catch (Exception e) {
-            System.out.println("Unable to connect to device " + e.getMessage());
+            Log.w(TAG, "Unable to connect to device", e);
             closeBluetoothConnection();
             return false;
         }
@@ -95,10 +98,10 @@ public class BluetoothManager {
         try {
             outputStream.write(command);
             outputStream.flush();
-            System.out.println("Sending command " + command);
+            Log.i(TAG, "Sending command " + command);
             return true;
         } catch (Exception e) {
-            System.out.println("Error sending command " + e);
+            Log.w(TAG, "Error sending command", e);
             closeBluetoothConnection();
             return false;
         }
@@ -120,7 +123,7 @@ public class BluetoothManager {
                 bluetoothSocket.close();
             }
         } catch (Exception e) {
-            System.out.println("Error in closing streams/socket " + e.getMessage());
+            Log.w(TAG, "Error in closing streams/socket", e);
         }
 
         inputStream = null;

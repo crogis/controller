@@ -9,6 +9,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -22,9 +23,6 @@ import com.controller.preference.AppPreference;
 
 
 public class MainActivity extends Activity {
-    //Todo add close for input/output stream
-    //Todo add closing of stuff in onDestroy
-
     private Activity context = this;
 
     private PairedDevicesAdapter pairedDevicesAdapter;
@@ -36,6 +34,8 @@ public class MainActivity extends Activity {
     private Button chooseLeaderBtn, moveBtn, changeFormationBtn, gatherDataBtn, reconnectBtn;
     private TextView leaderDeviceTextView;
     private ProgressDialog connectingProgressDialog;
+
+    private String TAG = "MainActivity";
 
     AppPreference appPreference;
 
@@ -71,14 +71,7 @@ public class MainActivity extends Activity {
         String leaderName = appPreference.findStringPref(appPreference.LEADER_DEVICE_NAME);
         String leaderAddress = appPreference.findStringPref(appPreference.LEADER_DEVICE_ADDRESS);
 
-        BluetoothDevice[] pairedDevices = bluetoothManager.getPairedDevices();
-        for (BluetoothDevice btDevice: pairedDevices) {
-            if( btDevice.getName().equals(leaderName) && btDevice.getAddress().equals(leaderAddress)) {
-                System.out.println("Paired device " + btDevice);
-                pairedDevice = btDevice;
-                break;
-            }
-        }
+        findPairedDeviceUsingPrefs();
 
         /*
             pairedDevice will be null in 2 instances
@@ -110,6 +103,7 @@ public class MainActivity extends Activity {
             reconnectBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    findPairedDeviceUsingPrefs();
                     connectToParentDevice();
                 }
             });
@@ -126,7 +120,7 @@ public class MainActivity extends Activity {
     public void onDestroy() {
         super.onDestroy();
         bluetoothManager.closeBluetoothConnection();
-        System.out.println("ON DESTROY MAIN ACTIVITY");
+        Log.i(TAG, "Exiting MainActivity");
     }
 
     private void setUpChooseLeaderButton() {
@@ -223,6 +217,19 @@ public class MainActivity extends Activity {
         thread.start();
     }
 
+    private void findPairedDeviceUsingPrefs() {
+        String leaderName = appPreference.findStringPref(appPreference.LEADER_DEVICE_NAME);
+        String leaderAddress = appPreference.findStringPref(appPreference.LEADER_DEVICE_ADDRESS);
+        BluetoothDevice[] pairedDevices = bluetoothManager.getPairedDevices();
+        for (BluetoothDevice btDevice: pairedDevices) {
+            if( btDevice.getName().equals(leaderName) && btDevice.getAddress().equals(leaderAddress)) {
+                Log.i(TAG, "Paired device " + btDevice);
+                pairedDevice = btDevice;
+                break;
+            }
+        }
+    }
+
     private void setDevicePrefs() {
         appPreference.setStringPref(appPreference.LEADER_DEVICE_NAME, pairedDevice.getName());
         appPreference.setStringPref(appPreference.LEADER_DEVICE_ADDRESS, pairedDevice.getAddress());
@@ -256,6 +263,7 @@ public class MainActivity extends Activity {
             public void run() {
                 showReconnectButton();
                 Toast.makeText(context, "Unable to connect to " + pairedDevice.getName(), Toast.LENGTH_SHORT).show();
+                // Need to set pairedDevice to null because it was unable to pair the device
                 pairedDevice = null;
             }
         });
