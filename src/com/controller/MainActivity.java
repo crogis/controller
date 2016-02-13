@@ -21,6 +21,11 @@ import com.controller.actions.MoveActivity;
 import com.controller.adapter.PairedDevicesAdapter;
 import com.controller.preference.AppPreference;
 
+/*
+    Once you open the application, this is the Activity that is started. 
+    You can think of an Activity as a screen where buttons, labels, and text fields are rendered.
+    So each screen in your application, such as the Move screen, Change Formation screen, and Gather Data screen are called Activities that's why there is a corresponding file for each in the action folder.
+*/
 
 public class MainActivity extends Activity {
     private Activity context = this;
@@ -39,44 +44,66 @@ public class MainActivity extends Activity {
 
     AppPreference appPreference;
 
+    /*
+        The onCreate method is called once and is the FIRST one called when the application is opened. 
+        So this handles creating what you see in the screen such as the buttons and labels.
+    */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        // Sets the view/layout for the screen
         setContentView(R.layout.activity_main);
 
+        // This class handles saving to the internal memory of your Android device which robot you have chosen as the leader
         appPreference = new AppPreference(this);
 
+        // The following just sets up the buttons and their corresponding listeners (what the buttons will do if clicked)
         setUpChooseLeaderButton();
         setUpActionButtons();
         setUpLeaderTextView();
     }
 
+    /*
+        The onResume method is called after the onStart method (which is called after the onCreate method), which is not implemented in this code because it is not needed.
+        So the process of an Activity once it is started is onCreate -> onStart -> onResume
+        onResume is called when ...
+        1. You first open the application 
+        2. You press the back button from a previous page. For example you're in the Move Activity (screen), and you press the back button, this method will be triggered. Take note that onCreate is only called once since this activity has already been rendered. This method can be called several times.
+        3. You pause the activity. For example, you press the home button in your device and you don't exit the application completely.
+    */
     @Override
     public void onResume() {
         super.onResume();
 
+        // Gets the Bluetooth Manager of Android. This can check if the Bluetooth is enabled for the device and can get the list of paired devices.
         bluetoothManager = BluetoothManager.getInstance();
 
+        // Checks if the Bluetooth is turned on. If not, it prompts the user to turn it on. It can't pass through this method if the Bluetooth is turned off.
         if(!bluetoothManager.isBtEnabled()) {
             showBluetoothSettings();
         }
 
         /*
-            Resetting pairedDevice to null because every time the app opens, it should not access the old value of the
-            paired device when the activity was paused (meaning you press the home button on your device,
-            so the application is paused, not exited)
+            Resetting pairedDevice (which is the reference to the leader robot) to null because every time the app opens, it should not access the old value of the
+            paired device when the Activity was paused because it can have problems in the connectivity. 
+            This can happen if you pause the activity (meaning you pressed the home button in your device) and unpair your Android device, then you open your application again. 
+            The reference of the pairedDevice will be to the device you have just unpaired, which is no longer valid and you can't connect to it any longer. This is why you should always have a fresh reference to the leader robot to avoid connectivity issues.
          */
         pairedDevice = null;
 
+        // Finds in the internal memory of your Android device the leader robot's name and Bluetooth Address
         String leaderName = appPreference.findStringPref(appPreference.LEADER_DEVICE_NAME);
         String leaderAddress = appPreference.findStringPref(appPreference.LEADER_DEVICE_ADDRESS);
 
+        // Finds the pairedDevice using the name and Bluetooth Address stored in memory
+        // At this point pairedDevice can still be equal to null or it can be equal to the device information of your leader robot
         findPairedDeviceUsingPrefs();
 
         /*
             pairedDevice will be null in 2 instances
             1. App is newly opened
-            2. User unpairs the chosen leader device (that's why there is a checker if the leaderName is originally empty or not)
+            2. User unpairs the chosen leader device (that's why there is a checker if the leaderName is originally empty or not). The leader name at the start of the application is empty because there has been no chosen leader yet.
          */
         if(pairedDevice == null) {
             leaderDeviceTextView.setText("-");
@@ -88,10 +115,11 @@ public class MainActivity extends Activity {
                 Toast.makeText(this, "Unable to find chosen leader device. Please choose another one.", Toast.LENGTH_LONG).show();
             }
         } else {
+            // Sets the text view in the screen to the name of the pairedDevice
             leaderDeviceTextView.setText(leaderName);
         }
 
-
+        // The following sets up the reconnect button in the upper right corner of the screen
         ActionBar actionBar = getActionBar();
         if(actionBar != null) {
             actionBar.setDisplayShowHomeEnabled(false);
@@ -100,6 +128,8 @@ public class MainActivity extends Activity {
             LayoutInflater layoutInflater = LayoutInflater.from(this);
             View view = layoutInflater.inflate(R.layout.action_bar_custom, null);
             reconnectBtn = (Button) view.findViewById(R.id.reconnect_button);
+            // The reconnectBtn is the reference for the Reconnect Button and we add listeners to buttons to know what actions they should do when clicked.
+            // In this case, it tries to find the pairedDevice using the leader name and the bluetooth address and it connects to the pairedDevice
             reconnectBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
