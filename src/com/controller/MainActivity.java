@@ -28,8 +28,11 @@ import com.controller.preference.AppPreference;
 */
 
 public class MainActivity extends Activity {
+    // Reference for the Activity itself
+    // 'this' - pertains to the Activity
     private Activity context = this;
     
+    // Used for logging events in the code
     private String TAG = "MainActivity";
 
     /*
@@ -90,7 +93,7 @@ public class MainActivity extends Activity {
         appPreference = new AppPreference(this);
 
         // The following just sets up the buttons and their corresponding listeners (what the buttons will do if clicked)
-        // By setting up the buttons, text views, you're already putting values in your class declarations
+        // By setting up the buttons, text views, you're already putting values (instantiating) in your class declarations
         setUpChooseLeaderButton();
         setUpActionButtons();
         setUpLeaderTextView();
@@ -151,14 +154,16 @@ public class MainActivity extends Activity {
             leaderDeviceTextView.setText(leaderName);
         }
 
-        // The following sets up the reconnect button in the upper right corner of the screen
+        // The following sets up the Reconnect button in the upper right corner of the screen
         ActionBar actionBar = getActionBar();
         if(actionBar != null) {
+            // Setting both of these to false removes the back button you see in the upper left corner of the screen (like those you see in the Move, Change Formation, and Gather Data screen)
             actionBar.setDisplayShowHomeEnabled(false);
             actionBar.setDisplayShowTitleEnabled(false);
 
             LayoutInflater layoutInflater = LayoutInflater.from(this);
             View view = layoutInflater.inflate(R.layout.action_bar_custom, null);
+            // Instantiating one of the buttons
             reconnectBtn = (Button) view.findViewById(R.id.reconnect_button);
             // The reconnectBtn is the reference for the Reconnect Button and we add listeners to buttons to know what actions they should do when clicked.
             // In this case, it tries to find the pairedDevice using the leader name and the bluetooth address and it connects to the pairedDevice
