@@ -29,19 +29,50 @@ import com.controller.preference.AppPreference;
 
 public class MainActivity extends Activity {
     private Activity context = this;
+    
+    private String TAG = "MainActivity";
 
+    /*
+    The following lines of code are class declarations. 
+    A class is a blueprint for creating different objects which defines its properties and behaviors. 
+    Java class objects exhibit the properties and behaviors defined by its class. 
+    A class can contain fields and methods to describe the behavior of an object. 
+    For example, the BluetoothManager class handles all the Bluetooth related properties and settings of the Android device.
+    
+    For now, each class' value is equal to 'null' since it has not been instantiated yet. These classes will be instantiated in different methods within the code.
+    Instantiated means that there will be an object creation, so it will have a value referenced to it (which is the object created), so it won't be equal to 'null' anymore.
+    */
+    
+    /* PairedDeviceAdapater class 
+       1. Handles the list of paired devices of the Android device
+       2. Sets the layout of the list when you click on "Choose Leader" button
+    */
     private PairedDevicesAdapter pairedDevicesAdapter;
 
+    /*
+        BluetoothDevice class
+        1. Reference to the leader device chosen
+    */
     private BluetoothDevice pairedDevice;
 
+    /*
+        BluetoothManager class
+        1. Handles all the Bluetooth related settings and proprerties
+    */
     private BluetoothManager bluetoothManager;
 
+    /*
+        Button, TextView, ProgressDialog class
+        1. Reference to the buttons, text views, and pop up dialogs you see on the screen
+    */
     private Button chooseLeaderBtn, moveBtn, changeFormationBtn, gatherDataBtn, reconnectBtn;
     private TextView leaderDeviceTextView;
     private ProgressDialog connectingProgressDialog;
 
-    private String TAG = "MainActivity";
-
+    /*
+        AppPreference class
+        1. Handles fetching and saving of the leader device in your Android device's internal memory
+    */
     AppPreference appPreference;
 
     /*
@@ -59,6 +90,7 @@ public class MainActivity extends Activity {
         appPreference = new AppPreference(this);
 
         // The following just sets up the buttons and their corresponding listeners (what the buttons will do if clicked)
+        // By setting up the buttons, text views, you're already putting values in your class declarations
         setUpChooseLeaderButton();
         setUpActionButtons();
         setUpLeaderTextView();
